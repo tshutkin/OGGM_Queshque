@@ -1,4 +1,9 @@
 # Improved function for calibrating OGGM inversion using GPR
+
+# Citation:
+# Shutkin, T. Y. et al. (under review). Modeling the impacts of climate trends and lake formation on the
+#   retreat of a tropical Andean glacier (1962-2020). The Cryosphere.
+
 # Tal Shutkin: 4/24/2024
 
 import os
@@ -173,14 +178,6 @@ def map_dist_thk(gdir, ds=None, glen_a=None, fs=None, varname_suffix=''):
         return da, volume
 
 
-
-def write_dist_thk(data):
-    
-    
-    return
-
-
-
 def error_eval(model, data, data_var, return_df=False):
     """
     Evaluate gridded model output data (xarray dataarray) of variable
@@ -209,34 +206,6 @@ def error_eval(model, data, data_var, return_df=False):
     else:
         return RMSE, MAE, ME
     
-    
-# Work in progress
-def calibrate_param(gdir, obs, model_var, data_var, start_val=2.4e-24, metric='RMSE', precision=0.1):
-    """
-    Optimal calibration of glen's A value (creep parameter) given an OGGM glacier directory and observation data
-    Optimize against metric "RMSE", "MAE"
-    """
-    
-    if metric=='RMSE':
-        metric=0
-    elif metric=='MAE':
-        metric=1
-    else:
-        raise ValueError('metric must be one of RMSE or MAE')
-        
-    # First Guess
-    da0,volume0,ds = map_dist_thk(gdir, glen_a=start_val,varname_suffix='')
-    rmse0 = error_eval(da0, obs, model_var, data_var)[metric]
-    # Second Guess
-    da1,volume1 = map_dist_thk(gdir, ds=ds, glen_a=start_val*2,varname_suffix='')
-    rmse1 = error_eval(da1, obs, model_var, data_var)[metric]
-    
-    # Now iterate
-    if abs(volume0-volume1)/volume0 < precision:
-        print(f'Calibration completed. The Optimized Creep parameters are  {da0.Creep} and {da1.Creep} at a precision of {precision*100}%')
-        return da0.Creep, da1.Creep
-
-    return
 
 def Creep_Cal(glacier, param_values, obs, model, model_varname,varname_suffix=''):
     # Function to randomly divide calibration data and minimize glacier thickness MAE against GPR data
